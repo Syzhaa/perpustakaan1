@@ -6,7 +6,8 @@
 
 Aplikasi web sederhana untuk manajemen perpustakaan yang dibangun menggunakan Laravel 11. Aplikasi ini dirancang untuk memudahkan admin dalam mengelola data buku, anggota, serta proses peminjaman dan pengembalian.
 
-![image](https://github.com/user-attachments/assets/8b481839-64d9-43cf-a8a7-ce555923074e)
+![image](https://github.com/user-attachments/assets/f185b8ee-52a2-49d0-9ded-f383571309b7)
+
 
 ## ✨ Fitur Utama
 https://github.com/Syzhaa/perpustakaan1/issues
@@ -15,8 +16,8 @@ https://github.com/Syzhaa/perpustakaan1/issues
 - **Manajemen Anggota**: Operasi CRUD untuk data anggota
 - **Manajemen Peminjaman**:
   - Mencatat transaksi peminjaman buku
-  - Admin dapat membuat buku baru langsung dari form peminjaman
   - Menandai buku yang telah dikembalikan
+  - Batas Pinjam 7 hari
 - **Impor Data dari Excel**: Menambahkan data buku dan anggota secara massal dari file .xlsx atau .csv
 - **Sistem Role**: Pembagian hak akses antara Admin dan Anggota
 
