@@ -1,221 +1,111 @@
 @extends('layouts.admin')
 
 @section('content')
-    {{-- Saya sarankan untuk menempatkan link Font Awesome di layout utama Anda (misal: layouts/admin.blade.php) 
-         agar tidak perlu memuatnya di setiap halaman. Namun, untuk contoh ini, saya letakkan di sini. --}}
-
+    {{-- Font Awesome & CSS Kustom (Sama seperti sebelumnya) --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        /* CSS Kustom untuk tampilan yang lebih modern */
-        .stat-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            color: #fff;
-            overflow: hidden;
-            /* Untuk memastikan gradien tidak tumpah */
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card .card-body {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 25px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .stat-card .stat-icon {
-            font-size: 3.5rem;
-            opacity: 0.2;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: opacity 0.3s ease;
-        }
-
-        .stat-card:hover .stat-icon {
-            opacity: 0.3;
-        }
-
-        .stat-card .stat-info h5 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-card .stat-info .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        /* Skema warna gradien */
-        .bg-card-1 {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-        }
-
-        .bg-card-2 {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
-        }
-
-        .bg-card-3 {
-            background: linear-gradient(135deg, #ffc107, #d39e00);
-        }
-
-        .bg-card-4 {
-            background: linear-gradient(135deg, #17a2b8, #117a8b);
-        }
-
-        .bg-card-5 {
-            background: linear-gradient(135deg, #dc3545, #b21f2d);
-        }
-
-        /* CSS untuk daftar aktivitas */
-        .activity-list .list-group-item {
-            border: none;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .activity-list .list-group-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex-grow: 1;
-        }
-
-        .activity-content p {
-            margin-bottom: 0;
-            line-height: 1.4;
-            color: #333;
-        }
-
-        .activity-content .activity-time {
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        .icon-pinjam {
-            background-color: #17a2b8;
-        }
-
-        .icon-kembali {
-            background-color: #28a745;
-        }
-
-        .icon-user {
-            background-color: #007bff;
-        }
-
-        .icon-buku {
-            background-color: #6f42c1;
-        }
+        .stat-card { border: none; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.07); transition: all 0.3s ease; color: #fff; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .stat-card .card-body { display: flex; align-items: center; justify-content: space-between; padding: 20px 25px; position: relative; z-index: 2; }
+        .stat-card .stat-icon { font-size: 3.5rem; opacity: 0.2; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+        .stat-card .stat-info h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-card .stat-info .stat-number { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+        .bg-card-1 { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .bg-card-2 { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .bg-card-3 { background: linear-gradient(135deg, #17a2b8, #117a8b); }
+        .bg-card-danger { background: linear-gradient(135deg, #dc3545, #b21f2d); }
     </style>
 
     <div class="container-fluid">
+        <h1 class="mb-4">Dashboard Admin</h1>
 
+        {{-- BAGIAN BARU: Notifikasi Peminjaman Terlambat --}}
+        @if($jumlahTerlambat > 0)
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+            <div>
+                <strong>Perhatian!</strong> Terdapat <strong>{{ $jumlahTerlambat }} buku</strong> yang terlambat dikembalikan lebih dari 7 hari.
+            </div>
+        </div>
+        @endif
+        
         <div class="row">
-            <!-- Card Jumlah Buku -->
-            <div class="col-xl-4 col-md-6 mb-4">
+            {{-- Card Statistik --}}
+            <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card stat-card bg-card-1">
                     <div class="card-body">
-                        <div class="stat-info">
-                            <h5>Jumlah Buku</h5>
-                            <span class="stat-number">{{ $jumlahBuku }}</span>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-book-open"></i>
-                        </div>
+                        <div class="stat-info"><h5>Jumlah Buku</h5><span class="stat-number">{{ $jumlahBuku }}</span></div>
+                        <div class="stat-icon"><i class="fas fa-book-open"></i></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Card Jumlah Anggota -->
-            <div class="col-xl-4 col-md-6 mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card stat-card bg-card-2">
                     <div class="card-body">
-                        <div class="stat-info">
-                            <h5>Jumlah Anggota</h5>
-                            <span class="stat-number">{{ $jumlahAnggota }}</span>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
+                        <div class="stat-info"><h5>Jumlah Anggota</h5><span class="stat-number">{{ $jumlahAnggota }}</span></div>
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Card Jumlah Peminjaman -->
-            <div class="col-xl-4 col-md-6 mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card stat-card bg-card-3">
                     <div class="card-body">
-                        <div class="stat-info text-dark">
-                            <h5>Total Peminjaman</h5>
-                            <span class="stat-number">{{ $jumlahPeminjaman }}</span>
-                        </div>
-                        <div class="stat-icon text-dark">
-                            <i class="fas fa-handshake"></i>
-                        </div>
+                        <div class="stat-info"><h5>Buku Dipinjam</h5><span class="stat-number">{{ $jumlahBukuDipinjam }}</span></div>
+                        <div class="stat-icon"><i class="fas fa-book-reader"></i></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Card Buku Sedang Dipinjam -->
-            <div class="col-xl-6 col-md-6 mb-4">
-                <div class="card stat-card bg-card-4">
+            {{-- CARD BARU: Buku Terlambat --}}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card bg-card-danger">
                     <div class="card-body">
-                        <div class="stat-info">
-                            <h5>Buku Sedang Dipinjam</h5>
-                            <span class="stat-number">{{ $jumlahBukuDipinjam }}</span>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-book-reader"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card Buku Belum Dikembalikan -->
-            <div class="col-xl-6 col-md-12 mb-4">
-                <div class="card stat-card bg-card-5">
-                    <div class="card-body">
-                        <div class="stat-info">
-                            <h5>Buku Belum Kembali</h5>
-                            <span class="stat-number">{{ $jumlahBelumDikembalikan }}</span>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
+                        <div class="stat-info"><h5>Buku Terlambat</h5><span class="stat-number">{{ $jumlahTerlambat }}</span></div>
+                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Bagian Aktivitas Terbaru --}}
+        {{-- BAGIAN BARU: Daftar Peminjaman Terlambat --}}
+        @if(!$peminjamanTerlambat->isEmpty())
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-list-ul me-2"></i>Daftar Peminjaman Terlambat</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Nama Peminjam</th>
+                                    <th>Judul Buku</th>
+                                    <th>Tanggal Pinjam</th>
+                                    <th>Terlambat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($peminjamanTerlambat as $peminjaman)
+                                <tr>
+                                    <td>{{ $peminjaman->user->name ?? 'N/A' }}</td>
+                                    <td>{{ $peminjaman->book->judul ?? 'N/A' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($peminjaman->tanggal_peminjaman)->format('d M Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            {{ \Carbon\Carbon::parse($peminjaman->tanggal_peminjaman)->addDays(7)->diffForHumans() }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+         {{-- Bagian Aktivitas Terbaru --}}
         <div class="row mt-3">
             <div class="col-12">
                 <div class="card">
@@ -272,7 +162,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
+        </div>{{-- Aktivitas Terbaru (Sama seperti sebelumnya) --}}
+        {{-- ... kode untuk aktivitas terbaru bisa diletakkan di sini ... --}}
     </div>
 @endsection

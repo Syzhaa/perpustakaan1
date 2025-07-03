@@ -19,6 +19,15 @@ class DashboardController extends Controller
         $jumlahPeminjaman = Peminjaman::count();
         $jumlahBukuDipinjam = Peminjaman::where('status', 'dipinjam')->count();
 
+        // --- LOGIKA UNTUK BUKU TERLAMBAT (Digabungkan) ---
+        $peminjamanTerlambat = Peminjaman::with(['user', 'book'])
+            ->where('status', 'dipinjam')
+            ->where('tanggal_peminjaman', '<', Carbon::now()->subDays(7))
+            ->get();
+
+        $jumlahTerlambat = $peminjamanTerlambat->count();
+        // --- AKHIR LOGIKA BUKU TERLAMBAT ---
+
         // 2. Mengumpulkan Aktivitas Terbaru (dari beberapa tabel)
         $aktivitas = collect();
 
@@ -75,7 +84,8 @@ class DashboardController extends Controller
             'jumlahAnggota' => $jumlahAnggota,
             'jumlahPeminjaman' => $jumlahPeminjaman,
             'jumlahBukuDipinjam' => $jumlahBukuDipinjam,
-            'jumlahBelumDikembalikan' => $jumlahBukuDipinjam, // Menggunakan data yang sama
+            'jumlahTerlambat' => $jumlahTerlambat, // Variabel baru untuk notifikasi
+            'peminjamanTerlambat' => $peminjamanTerlambat, // Variabel baru untuk daftar
             'aktivitasTerbaru' => $aktivitasTerbaru,
         ]);
     }

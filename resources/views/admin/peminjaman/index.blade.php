@@ -13,7 +13,8 @@
                 <th scope="col">Nama Peminjam</th>
                 <th scope="col">Judul Buku</th>
                 <th scope="col">Tanggal Pinjam</th>
-                <th scope="col">Tanggal Kembali</th> {{-- KOLOM BARU --}}
+                <th scope="col">Batas Pengembalian</th> {{-- KOLOM BARU --}}
+                <th scope="col">Tanggal Kembali</th>
                 <th scope="col">Status</th>
                 <th scope="col">Aksi</th>
             </tr>
@@ -27,6 +28,17 @@
                     <td>{{ $peminjaman->book->judul ?? 'Buku Dihapus' }}</td>
                     <td>{{ \Carbon\Carbon::parse($peminjaman->tanggal_peminjaman)->format('d M Y') }}</td>
 
+                    {{-- Menampilkan batas tanggal pengembalian (7 hari setelah pinjam) --}}
+                    <td>
+                        @php
+                            $batasPengembalian = \Carbon\Carbon::parse($peminjaman->tanggal_peminjaman)->addDays(7);
+                            $isTerlambat = $peminjaman->status == 'dipinjam' && now()->gt($batasPengembalian);
+                        @endphp
+                        <span class="{{ $isTerlambat ? 'text-danger fw-bold' : '' }}">
+                            {{ $batasPengembalian->format('d M Y') }}
+                        </span>
+                    </td>
+
                     {{-- Menampilkan tanggal kembali jika statusnya sudah dikembalikan --}}
                     <td>
                         @if ($peminjaman->status == 'dikembalikan' && $peminjaman->tanggal_pengembalian)
@@ -38,7 +50,9 @@
 
                     <td>
                         @if ($peminjaman->status == 'dipinjam')
-                            <span class="badge bg-warning text-dark">Dipinjam</span>
+                            <span class="badge {{ $isTerlambat ? 'bg-danger' : 'bg-warning text-dark' }}">
+                                {{ $isTerlambat ? 'Terlambat' : 'Dipinjam' }}
+                            </span>
                         @else
                             <span class="badge bg-success">Dikembalikan</span>
                         @endif
@@ -59,8 +73,8 @@
                 </tr>
             @empty
                 <tr>
-                    {{-- colspan diubah menjadi 7 karena ada kolom baru --}}
-                    <td colspan="7" class="text-center">Belum ada data peminjaman.</td>
+                    {{-- colspan diubah menjadi 8 karena ada kolom baru --}}
+                    <td colspan="8" class="text-center">Belum ada data peminjaman.</td>
                 </tr>
             @endforelse
         </tbody>
